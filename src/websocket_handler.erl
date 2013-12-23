@@ -17,7 +17,8 @@ websocket_init(_TransportName, Req, _Opts) ->
  
 websocket_handle({text, Msg}, Req, State) ->
     lager:info("websocket_handle/3"),
-    lager:info(Msg).
+    lager:info(Msg),
+    {ok, Req, State}.
 
 websocket_info(_Info, Req, State) ->    
     lager:info("websocket_info/3"),

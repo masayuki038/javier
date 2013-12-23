@@ -20,7 +20,7 @@ get_html() ->
     Host = econfig:get_value(javier, "server", "host"),
     Port = econfig:get_value(javier, "server", "port"),
     Prefix = helper:get_request_prefix(),
-    {ok, Cwd} = file:get_cwd(),
-    Filename = filename:join([Cwd, "priv", "index.html"]),
+    PrivDir = code:priv_dir(javier),
+    Filename = filename:join([PrivDir, "index.html"]),
     {ok, Compiled} = sgte:compile_file(Filename),
     sgte:render(Compiled, [{host, Host}, {port, Port}, {prefix, Prefix}]).

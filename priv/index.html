@@ -1,70 +1,70 @@
 <html>
 <head>
- <link href='$prefix$/static/css/slate/bootstrap.css' rel='stylesheet'>
-  <link href='$prefix$/static/css/custom.css' rel='stylesheet'>
+  <link rel='stylesheet' href='$prefix$/static/css/bootstrap.css' media="screen">
+  <link rel='stylesheet' href='$prefix$/static/css/custom.css'>
   <script type="text/javascript" src='https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js'></script>
   <script type="text/javascript" src='$prefix$/static/js/handlebars.js'></script>
   <script type="text/javascript" src='$prefix$/static/js/bootstrap.js'></script>
   <script type="text/javascript" src='$prefix$/static/js/ws_events_dispatcher.js'></script>
+  <title>javier</title>
 </head>
 <body>
-
-  <div class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
-      <div class="container">
-        <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+  <div class="container">
+    <div class="navbar navbar-inverse">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-inverse-collapse">
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="brand" href="#">erl-shib</a>
-        <div class="nav-collapse collapse">
-          <ul class="nav">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="#about">About</a></li>
-          </ul>
+        <a class="navbar-brand" href="#">javier</a>
+      </div>
+    </div>
+    <div class="chat-logs">
+ 	  <div class="row">
+        <div class="col-lg-12">
+          <div class="list-group">
+            <a href="#" class="list-group-item">
+              <p class="list-group-item-heading">user1</p>
+              <p class="list-group-item-text">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
+            </a>
+            <a href="#" class="list-group-item">
+              <p class="list-group-item-heading">user2</p>
+              <p class="list-group-item-text">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
+            </a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="container">
-    <header class="jumbotron subhead" id="overview">
-      <div>
-	<div class="row">
-          <div id="cluster_status">
+    <div class="chat-box-panel">
+      <div class="row">
+        <form>
+          <div class="col-lg-12">
+            <textarea class="form-control" rows="3" id="chat-box"></textarea>
+            <span class="help-block">Press Shift+Enter to send message.</span>
           </div>
-          <form>
-            <div class="history_container">
-              <div id="history_list">
-              </div>            
-            </div>
-            <div>
-              <textarea class="input-xxlarge new_query" id="hql" rows="10"></textarea>
-            </div>
-            <div class="well editbox">
-              <div>
-		<a class="btn" id="new_query" href="#">new query</a>
-		<a class="btn" id="copy_to_new_query" href="#">copy_to_new_query</a>
-		<a class="btn" id="execute" href="#">execute</a>
-		<a class="btn" id="cancel" href="#">cancel</a>
-              </div>
-              <div id="result_panel">
-		<div>
-                  <a class="btn" id="delete" href="#">delete</a>
-                  <a href="#result_dialog" role="button" class="btn" id="show_full" data-toggle="modal">show full</a>
-                  <a href="#result_dialog" role="button" class="btn" id="show_head" data-toggle="modal">show head</a>
-                  <a class="btn" id="tsv" href="#">tsv</a>
-                  <a class="btn" id="csv" href="#">csv</a>
-		</div>
-		<div id="result_information">
-		</div>
-              </div>
-            </div>
-          </form>
-	</div>
+        </form>
       </div>
-    </header>
+    </div>
   </div>
 </body>
+<script type="text/javascript">
+$('#chat-box').keyup(function (event) {
+  if (event.keyCode == 13 && event.shiftKey) {
+    var content = this.value;
+    var obj = {message: content, user: 'masayuki'};
+    server.send('send_message', JSON.stringify(obj));
+    this.value = "";
+    event.stopPropagation();
+  }
+});
+
+var server = new FancyWebSocket('ws://$host$:$port$$prefix$/websocket');
+server.bind('open', function() {
+  //alert("FancyWebSocket#open");
+});
+
+</script>
 </html>
+
+

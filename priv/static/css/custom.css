@@ -1,64 +1,13 @@
 body {
-  padding-top: 60px;
+  padding-top: 5px;
 }
 
-#result_panel {
-  display: none;
+a.list-group-item .list-group-item-heading {
+  color: #1474ee;
+  font-weight: bold;
 }
 
-textarea.new_query {
-  color: #222222;
-  backgroud-color: #ffffff;
-}
-
-textarea.result {
-  color: #222222;
-  backgroud-color: #aaaaaa;
-}
-
-.history_container {
-  float: right;
+.chat-logs {
+  height: 70%;
   //border: solid 1px #aaaaaa;
-  padding: 5px;
-}
-
-#history_list {
-  margin-top: 10px;
-}
-
-.query_item {
-  //border: solid 1px #aaaaaa;
-  padding: 5px;
-  margin-top: 5px;
-}
-
-.editbox {
-  width: 512px;
-  padding: 5px;
-}
-
-.modal-body {
-  //height: 350px;
-  width: auto;
-}
-
-#show_full_panel {
-  background-color: #ffffff;
-  height: 350px;
-  color: #000000;
-  font-size: 0.8em;
-  line-height: 1.0em;
-  overflow: scroll;
-  word-break: normal;
-  word-wrap: normal;
-  white-space: pre;
-}
-
-.cluster_status_title {
-  
-}
-
-.cluster_status_value {
-  margin-right: 20px;
-  margin-left: 3px;
 }

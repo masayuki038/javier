@@ -10,5 +10,7 @@ log
 console.log
 error.log
 rel/javier
+dev
 cscope.*
 erl_crash.dump
+javier.ini
