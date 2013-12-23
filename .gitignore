@@ -1,0 +1,14 @@
+.eunit
+ebin
+deps
+*.o
+*.beam
+*.plt
+*~
+Mnesia.*
+log
+console.log
+error.log
+rel/javier
+cscope.*
+erl_crash.dump
