@@ -49,11 +49,18 @@
   </div>
 </body>
 <script type="text/javascript">
+function chomp(str) {
+  if(str == undefined || str == null) {
+    return str;
+  }
+  return str.replace(/(\n|\r)+$/, '');
+}
+
 $('#chat-box').keyup(function (event) {
   if (event.keyCode == 13 && event.shiftKey) {
-    var content = this.value;
+    var content = chomp(this.value);
     var obj = {message: content, user: 'masayuki'};
-    server.send('send_message', JSON.stringify(obj));
+    server.send('send_message', obj);
     this.value = "";
     event.stopPropagation();
   }
@@ -62,6 +69,11 @@ $('#chat-box').keyup(function (event) {
 var server = new FancyWebSocket('ws://$host$:$port$$prefix$/websocket');
 server.bind('open', function() {
   //alert("FancyWebSocket#open");
+});
+
+server.bind('receive_message', function(data) {
+  alert(data.user + ":" + data.message);
+  
 });
 
 </script>
