@@ -8,6 +8,8 @@ a.list-group-item .list-group-item-heading {
 }
 
 .chat-logs {
+  overflow-x: hidden;
+  overflow-y: auto;
   height: 70%;
   //border: solid 1px #aaaaaa;
 }

@@ -26,7 +26,7 @@ websocket_info({timeout, _Ref, Msg}, Req, State) ->
     lager:info("Decoded: ~p~n", [Decoded]),
     case Decoded of
         {[{<<"event">>, <<"send_message">>}, {<<"data">>, {[{<<"message">>, Content}, {<<"user">>, User}]}}]} ->
-            {reply, {text, jsonx:encode([{<<"event">>, <<"receive_message">>}, {<<"data">>, {[{<<"message">>, Content}, {<<"user">>, User}]}}])}, Req, State}
+            {reply, {text, jsonx:encode([{<<"event">>, <<"message">>}, {<<"data">>, {[{<<"message">>, Content}, {<<"user">>, User}]}}])}, Req, State}
     end;
 websocket_info(_Info, Req, State) ->    
     lager:info("websocket_info/3"),
