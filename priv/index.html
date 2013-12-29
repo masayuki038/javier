@@ -39,7 +39,8 @@
         <div class="col-lg-12">
           <div class="list-group">
             <a href="#" class="list-group-item" ng-repeat="message in messages">
-              <p class="list-group-item-heading">{{message.user}}</p>
+              <div class="message-at">{{message.at}}</div>
+              <p class="list-group-item-heading" style="overflow: hidden">{{message.user}}</p>
               <p class="list-group-item-text" ng-bind-html="message.message | sanitize | convert_linefeed"></p>
             </a>
           </div>

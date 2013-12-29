@@ -13,3 +13,8 @@ a.list-group-item .list-group-item-heading {
   height: 70%;
   //border: solid 1px #aaaaaa;
 }
+
+.message-at {
+  float: right;
+  font-size: 0.9em;
+}

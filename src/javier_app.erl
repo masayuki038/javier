@@ -10,12 +10,12 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
+    register(room, spawn(fun() -> room:loop([]) end)),
     ok = bootstrap_cowboy(),
     javier_sup:start_link().
 
 stop(_State) ->
     ok.
-
 
 bootstrap_cowboy() ->
     application:set_env(lager, handlers, [
