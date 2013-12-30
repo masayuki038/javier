@@ -11,6 +11,7 @@
 
 start(_StartType, _StartArgs) ->
     register(room, spawn(fun() -> room:loop([]) end)),
+    storage:start(),
     ok = bootstrap_cowboy(),
     javier_sup:start_link().
 

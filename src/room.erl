@@ -11,6 +11,7 @@ loop(Pids) ->
         {message, {Content, User}} ->
             lager:info("~p(~p) received~n", [Content, User]),
             Message = storage:create_message(Content, User),
+            storage:update_message(Message),
             ok = publish(Pids, Message),
             loop(Pids)
     end.

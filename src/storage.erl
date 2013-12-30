@@ -4,9 +4,6 @@
 -include("message.hrl").
 -include_lib("stdlib/include/qlc.hrl").
 
-do_this_once() ->
-         ok.
-
 clean_start() ->
     Node = node(),
     mnesia:delete_schema([Node]),
@@ -16,8 +13,8 @@ start() ->
     Node = node(),
         case mnesia:create_schema([Node]) of
         ok ->
-                prepare_db(true, Node);
-                    {error, {Node, {already_exists, Node}}} ->
+            prepare_db(true, Node);
+        {error, {Node, {already_exists, Node}}} ->
             prepare_db(false, Node); 
         _ -> error
     end.
