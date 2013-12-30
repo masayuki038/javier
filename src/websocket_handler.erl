@@ -13,7 +13,6 @@ init({tcp, http}, _Req, _Opts) ->
 
 websocket_init(_TransportName, Req, _Opts) ->
     lager:info("websocket_init/3"),
-    room ! {join, self()},
     {ok, Req, undefined_state}.
  
 websocket_handle({text, Msg}, Req, State) ->
@@ -23,7 +22,9 @@ websocket_handle({text, Msg}, Req, State) ->
     lager:info("Decoded: ~p~n", [Decoded]),
     case Decoded of
         {[{<<"event">>, <<"send_message">>}, {<<"data">>, {[{<<"message">>, Content}, {<<"user">>, User}]}}]} ->
-            room ! {message, {Content, User}}
+            room ! {message, {Content, User}};
+        {[{<<"event">>, <<"join">>}, {<<"data">>, {[{<<"user">>, User}]}}]} ->
+            room ! {join, {self(), User}}
     end,
     {ok, Req, State}.
 
@@ -36,4 +37,5 @@ websocket_info(_Info, Req, State) ->
     
 websocket_terminate(_Reason, _Req, _State) -> 
     lager:info("websocket_terminate/3"),
+    room ! {quit, self()},
     ok.

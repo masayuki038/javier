@@ -21,7 +21,8 @@ app.factory('ChatService', function() {
  
     var server = new FancyWebSocket(uri);
     server.bind('open', function() {
-       //alert("FancyWebSocket#open");
+      var obj = {user: 'masayuki'};
+      service.server.send('join', obj);
     });
 
     server.bind('message', function(data) {
