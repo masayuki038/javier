@@ -21,7 +21,7 @@ app.factory('ChatService', function() {
  
     var server = new FancyWebSocket(uri);
     server.bind('open', function() {
-      var obj = {user: 'masayuki'};
+      var obj = {user: sessionStorage.getItem("name")};
       service.server.send('join', obj);
     });
 
@@ -33,7 +33,7 @@ app.factory('ChatService', function() {
   }
 
   service.send_message = function(message) {
-    var obj = {message: message, user: 'masayuki'};
+    var obj = {message: message, user: sessionStorage.getItem("name")};
     service.server.send('send_message', obj);
   }
 
@@ -65,7 +65,17 @@ function ChatCtrl($scope, $sanitize, ChatService) {
   });
 
   $scope.connect = function(uri) {
-    ChatService.connect(uri);
+    $scope.uri = uri;
+    var storage = sessionStorage;
+    var name = storage.getItem('name');
+    if(!name) {
+      $('#login_dialog').on('shown', function () {
+        $('#profile_name').focus();
+      });
+      $('#login_dialog').modal('show');
+    } else {
+      ChatService.connect(uri);
+    }
   }
  
   $scope.send_message = function(message) {
@@ -78,5 +88,14 @@ function ChatCtrl($scope, $sanitize, ChatService) {
       return str;
     }
     return str.replace(/(\n|\r)+$/, '');
+  }
+}
+
+function LoginCtrl($scope, ChatService) {
+  $scope.save_change = function() {
+    var storage = sessionStorage;
+    storage.setItem('name', $scope.name);
+    $('#login_dialog').modal('hide');
+    ChatService.connect($scope.uri);
   }
 }

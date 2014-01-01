@@ -19,7 +19,7 @@ loop(Clients) ->
             {NewClients, Removed} = lists:partition(
                 fun({E, _User}) -> not (Pid =:= E) end, Clients
             ),
-            lists:foreach(fun({R, User}) -> send_message(NewClients, <<"quit.">>, User) end, Removed),
+            lists:foreach(fun({_R, User}) -> send_message(NewClients, <<"quit.">>, User) end, Removed),
             loop(NewClients)
     end.
 
@@ -30,10 +30,11 @@ send_message(Clients, Content, User) ->
 
 publish([Client | Clients], Message) ->
     lager:info("publish([Pid | Pids], Message)"),
-    #message{content = Content, user = User, at = At} = Message,
-    {Pid, User} = Client,
-    Pid ! {publish, {Content, User, At}},
-    lager:info("~p(~p) published", [Content, User]),
+    #message{content = Content, user = Sender, at = At} = Message,
+    lager:info("Client: ~p", [Client]),
+    {Pid, _Receiver} = Client,
+    Pid ! {publish, {Content, Sender, At}},
+    lager:info("~p(~p) published", [Content, Sender]),
     publish(Clients, Message);
 publish([], _Message) ->
     ok.

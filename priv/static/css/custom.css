@@ -18,3 +18,12 @@ a.list-group-item .list-group-item-heading {
   float: right;
   font-size: 0.9em;
 }
+
+.modal-profile {
+  width: 350px;
+}
+
+#profile_name {
+  width: 250px;
+}
+

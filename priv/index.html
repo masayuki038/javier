@@ -10,8 +10,8 @@
   <script type="text/javascript" src='$prefix$/static/js/ws_events_dispatcher.js'></script>
   <title>javier</title>
 </head>
-<body>
-  <div class="container" ng-app="app" ng-controller="ChatCtrl">
+<body ng-app="app">
+  <div class="container" ng-controller="ChatCtrl">
     <div class="navbar navbar-inverse">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-inverse-collapse">
@@ -43,6 +43,21 @@
               <p class="list-group-item-heading" style="overflow: hidden">{{message.user}}</p>
               <p class="list-group-item-text" ng-bind-html="message.message | sanitize | convert_linefeed"></p>
             </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="login_dialog" role="dialog" class="modal" ng-controller="LoginCtrl">
+      <div class="modal-dialog modal-profile">
+        <div class="modal-content">
+          <div class="modal-header">
+            Your Profile
+          </div>
+          <div class="modal-body">
+            Name: <input type="text" id="profile_name" ng-model="name">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" ng-click="save_change()">Save changes</button>
           </div>
         </div>
       </div>
