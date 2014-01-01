@@ -12,7 +12,7 @@ app.directive('ngEnter', function() {
     });
   };
 });
- 
+
 app.factory('ChatService', function() {
   var service = {};
  
@@ -58,10 +58,24 @@ app.filter('convert_linefeed', function() {
 
 function ChatCtrl($scope, $sanitize, ChatService) {
   $scope.messages = [];
+  $scope.active = true;
+  $scope.unread = 0;
+
+  window.onblur = function() {
+    $scope.inactivate();
+  }
+
+  window.onfocus = function() {
+    $scope.activate();
+  }
 
   ChatService.subscribe(function(data) {
     for(var i = 0; i < data.length; i++) {
       $scope.messages.unshift(data[i]);
+    }
+    if(!$scope.active) {
+      $scope.unread += data.length;
+      document.title = "javier(" + $scope.unread + ")";
     }
     $scope.$apply();
   });
@@ -83,6 +97,16 @@ function ChatCtrl($scope, $sanitize, ChatService) {
   $scope.send_message = function(message) {
     var content = chomp(message);
     ChatService.send_message(content);   
+  }
+
+  $scope.inactivate = function() {
+    $scope.active = false;
+  }
+
+  $scope.activate = function() {
+    $scope.active = true;
+    $scope.unread = 0;
+    window.setTimeout(function () { $(document).attr("title", "javier"); }, 200);
   }
 
   var chomp = function(str) {
