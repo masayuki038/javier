@@ -59,8 +59,10 @@ app.filter('convert_linefeed', function() {
 function ChatCtrl($scope, $sanitize, ChatService) {
   $scope.messages = [];
 
-  ChatService.subscribe(function(message) {
-    $scope.messages.unshift(message);
+  ChatService.subscribe(function(data) {
+    for(var i = 0; i < data.length; i++) {
+      $scope.messages.unshift(data[i]);
+    }
     $scope.$apply();
   });
 

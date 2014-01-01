@@ -28,9 +28,12 @@ websocket_handle({text, Msg}, Req, State) ->
     end,
     {ok, Req, State}.
 
-websocket_info({publish, {Content, User, At}}, Req, State) ->
-    lager:info("websocket_info({publish, Content, User}, Req, State)"),
-    {reply, {text, jsonx:encode([{<<"event">>, <<"message">>}, {<<"data">>, {[{<<"message">>, Content}, {<<"user">>, User}, {<<"at">>, At}]}}])}, Req, State};
+websocket_info({publish, Messages}, Req, State) ->
+    lager:info("websocket_info({publish, Messages}, Req, State)"),
+    lager:info("Messages: ~p", [Messages]),
+    Encoded = jsonx:encode([{<<"event">>, <<"message">>}, {<<"data">>, to_binary_list(Messages)}]),
+    lager:info("Encoded: ~p", [Encoded]),
+    {reply, {text, Encoded}, Req, State};
 websocket_info(_Info, Req, State) ->    
     lager:info("websocket_info/3"),
     {ok, Req, State}.
@@ -39,3 +42,12 @@ websocket_terminate(_Reason, _Req, _State) ->
     lager:info("websocket_terminate/3"),
     room ! {quit, self()},
     ok.
+
+to_binary_list(Messages) ->
+    to_binary_list(Messages, []).
+
+to_binary_list([Message | Messages], Ret) ->
+    {message, _, Content, User, At} = Message,
+    to_binary_list(Messages, [{[{<<"message">>, Content}, {<<"user">>, User}, {<<"at">>, At}]} | Ret]);
+to_binary_list([], Ret) ->
+    Ret.

@@ -8,6 +8,7 @@ loop(Clients) ->
         {join, {Pid, User}} ->
             lager:info("~p joined~n", [Pid]),
             NewClients = [{Pid, User} | Clients],
+            publish([{Pid, User}], storage:get_messages()),
             ok = send_message(NewClients, <<"joined.">>, User),
             loop(NewClients);
         {message, {Content, User}} ->
@@ -26,17 +27,15 @@ loop(Clients) ->
 send_message(Clients, Content, User) ->
     Message = storage:create_message(Content, User),
     storage:update_message(Message),
-    publish(Clients, Message).
+    publish(Clients, [Message]).
 
-publish([Client | Clients], Message) ->
+publish([Client | Clients], Messages) ->
     lager:info("publish([Pid | Pids], Message)"),
-    #message{content = Content, user = Sender, at = At} = Message,
     lager:info("Client: ~p", [Client]),
     {Pid, _Receiver} = Client,
-    Pid ! {publish, {Content, Sender, At}},
-    lager:info("~p(~p) published", [Content, Sender]),
-    publish(Clients, Message);
-publish([], _Message) ->
+    Pid ! {publish, Messages},
+    publish(Clients, Messages);
+publish([], _Messages) ->
     ok.
 
 
