@@ -6,6 +6,7 @@
 -export([websocket_handle/3]).
 -export([websocket_info/3]).
 -export([websocket_terminate/3]).
+-include("message.hrl").
 
 init({tcp, http}, _Req, _Opts) ->
     lager:info("init/3"),
@@ -23,8 +24,8 @@ websocket_handle({text, Msg}, Req, State) ->
     case Decoded of
         {[{<<"event">>, <<"send_message">>}, {<<"data">>, {[{<<"message">>, Content}, {<<"user">>, User}]}}]} ->
             room ! {message, {Content, User}};
-        {[{<<"event">>, <<"join">>}, {<<"data">>, {[{<<"user">>, User}]}}]} ->
-            room ! {join, {self(), User}}
+        {[{<<"event">>, <<"authenticate">>}, {<<"data">>, {[{<<"mail">>, Mail}, {<<"password">>, Password}, {<<"name">>, Name}]}}]} ->
+            room ! {authenticate, {self(), #member{mail = Mail, password = Password, name = Name}}}
     end,
     {ok, Req, State}.
 
@@ -33,6 +34,19 @@ websocket_info({publish, Messages}, Req, State) ->
     lager:info("Messages: ~p", [Messages]),
     Encoded = jsonx:encode([{<<"event">>, <<"message">>}, {<<"data">>, to_binary_list(Messages)}]),
     lager:info("Encoded: ~p", [Encoded]),
+    {reply, {text, Encoded}, Req, State};
+websocket_info({authenticated, Member}, Req, State) ->
+    lager:info("websocket_info({authenticated, Member}, Req, State)"),
+    lager:info("Member: ~p", [Member]),
+    #member{name = Name} = Member,
+    Encoded = jsonx:encode([{<<"event">>, <<"authenticated">>}, {<<"data">>, [{<<"token">>, <<"aaa">>}, {<<"name">>, Name}]}]),
+    lager:info("Encoded: ~p", [Encoded]),
+    room ! {join, {self(), Name}},
+    {reply, {text, Encoded}, Req, State};
+websocket_info({unauthenticated, Member}, Req, State) ->
+    lager:info("websocket_info({unauthenticated, Member}, Req, State)"),
+    lager:info("Member: ~p", [Member]),
+    Encoded = jsonx:encode([{<<"event">>, <<"unauthenticated">>}, {<<"data">>, [{<<"error">>, <<"Authentication Failed">>}]}]),
     {reply, {text, Encoded}, Req, State};
 websocket_info(_Info, Req, State) ->    
     lager:info("websocket_info/3"),

@@ -16,17 +16,31 @@ app.directive('ngEnter', function() {
 app.factory('ChatService', function() {
   var service = {};
  
-  service.connect = function(uri) {
-    if(service.server) { return; }
+  service.connect = function(uri, callback) {
+    if(service.server) {
+      if(callback) {
+        callback();
+      } 
+      return; 
+    }
  
     var server = new FancyWebSocket(uri);
     server.bind('open', function() {
-      var obj = {user: sessionStorage.getItem("name")};
-      service.server.send('join', obj);
+      if(callback) {
+        callback();
+      }
     });
 
     server.bind('message', function(data) {
-      service.callback(data);  
+      service.message_callback(data);  
+    });
+
+    server.bind('authenticated', function(data) {
+      service.auth_callback(data);
+    });
+
+    server.bind('unauthenticated', function(data) {
+      service.unauth_callback(data);
     });
 
     service.server = server;
@@ -37,8 +51,21 @@ app.factory('ChatService', function() {
     service.server.send('send_message', obj);
   }
 
-  service.subscribe = function(callback) {
-    service.callback = callback;
+  service.login = function(mail, password, name) {
+    var obj = {mail: mail, password: password, name: name};
+    service.server.send('authenticate', obj);
+  }
+
+  service.on_message = function(callback) {
+    service.message_callback = callback;
+  }
+
+  service.on_authenticated = function(callback) {
+    service.auth_callback = callback;
+  }
+
+  service.on_unauthenticated = function(callback) {
+    service.unauth_callback = callback;
   }
 
   return service;
@@ -69,7 +96,7 @@ function ChatCtrl($scope, $sanitize, ChatService) {
     $scope.activate();
   }
 
-  ChatService.subscribe(function(data) {
+  ChatService.on_message(function(data) {
     for(var i = 0; i < data.length; i++) {
       $scope.messages.unshift(data[i]);
     }
@@ -83,15 +110,10 @@ function ChatCtrl($scope, $sanitize, ChatService) {
   $scope.connect = function(uri) {
     $scope.uri = uri;
     var storage = sessionStorage;
-    var name = storage.getItem('name');
-    if(!name) {
-      $('#login_dialog').on('shown', function () {
-        $('#profile_name').focus();
-      });
-      $('#login_dialog').modal('show');
-    } else {
-      ChatService.connect(uri);
-    }
+    $('#login_dialog').on('shown', function () {
+      $('#profile_name').focus();
+    });
+    $('#login_dialog').modal('show');
   }
  
   $scope.send_message = function(message) {
@@ -118,10 +140,25 @@ function ChatCtrl($scope, $sanitize, ChatService) {
 }
 
 function LoginCtrl($scope, ChatService) {
-  $scope.save_change = function() {
+  $scope.has_error = false;
+  $scope.error = undefined;
+
+  ChatService.on_authenticated(function(data) {
     var storage = sessionStorage;
-    storage.setItem('name', $scope.name);
+    storage.setItem('token', data.token);
+    storage.setItem('name', data.name);
     $('#login_dialog').modal('hide');
-    ChatService.connect($scope.uri);
+  });
+
+  ChatService.on_unauthenticated(function(data) {
+    $scope.has_error = true;
+    $scope.error = data.error;
+    $scope.$apply();
+  });
+
+  $scope.save_change = function() {
+    ChatService.connect($scope.uri, function() {
+      ChatService.login($scope.mail, $scope.password, $scope.name);
+    });
   }
 }

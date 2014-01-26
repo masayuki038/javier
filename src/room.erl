@@ -15,6 +15,24 @@ loop(Clients) ->
             lager:info("~p(~p) received~n", [Content, User]),
             ok = send_message(Clients, Content, User),
             loop(Clients);
+        {authenticate, {Pid, Input}} ->
+            #member{mail = Mail, password = Password, name = Name} = Input,
+            lager:info("~p try authentication~n", [Name]),
+            case storage:get_member(Mail) of
+                {ok, Member} ->
+                    %% password check
+                    #member{password = Password2} = Member,
+                    case  Password =:= Password2 of
+                        true -> 
+                            Pid ! {authenticated, Member};
+                        false ->
+                            Pid ! {unauthenticated, Input}
+                    end;
+                {ng, _} ->
+                    storage:update_member(Input),
+                    Pid ! {authenticated, Input}
+            end,
+            loop(Clients);
         {quit, Pid} ->
             lager:info("~p left~n", [Pid]),
             {NewClients, Removed} = lists:partition(

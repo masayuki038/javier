@@ -53,12 +53,37 @@
           <div class="modal-header">
             Your Profile
           </div>
-          <div class="modal-body">
-            Name: <input type="text" id="profile_name" ng-model="name">
+          <div ng-show="has_error">
+            <div class="alert alert-dismissable alert-danger">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+              <strong>Oh snap!</strong> {{error}}
+            </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" ng-click="save_change()">Save changes</button>
-          </div>
+          <form class="form-horizontal">
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="profile_name" class="col-lg-2 control-label">Name</label>
+                <div class="col-lg-10">
+                  <input type="text" class="form-control" id="profile_name" placeholder="taro" ng-model="name">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="profile_mail" class="col-lg-2 control-label">Email</label>
+                <div class="col-lg-10">
+                  <input type="text" class="form-control" id="profile_mail" placeholder="mail address" ng-model="mail">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="profile_password" class="col-lg-2 control-label">Password</label>
+                <div class="col-lg-10">
+                  <input type="text" class="form-control" id="profile_password" placeholder="password" ng-model="password">
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" ng-click="save_change()">Submit</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

@@ -35,6 +35,7 @@ prepare_db(CreateTables, Node) ->
 -spec create_tables(_) -> ok.
 create_tables(Node) ->
     mnesia:create_table(message, [{attributes, record_info(fields, message)}, {disc_copies, [Node]}]),
+    mnesia:create_table(member, [{attributes, record_info(fields, member)}, {disc_copies, [Node]}]),
     ok.
 
 -spec create_message(undefined | binary(), _) -> message().
@@ -70,6 +71,22 @@ do(Q) ->
                
 -spec update_message(_) -> {aborted, _} | {atomic, _}.
 update_message(M) ->
+    mnesia:transaction(fun() ->mnesia:write(M) end).
+
+-spec get_member(_) -> any().
+get_member(Mail) ->
+    F = fun() -> mnesia:read({member, Mail}) end,
+    {atomic, Val} = mnesia:transaction(F),
+    case length(Val) of
+        1 ->
+            [H | _] = Val,
+            {ok, H};
+        _ ->
+            {ng, not_exists}
+    end.
+
+-spec update_member(_) -> {aborted, _} | {atomic, _}.
+update_member(M) ->
     mnesia:transaction(fun() ->mnesia:write(M) end).
 
 -spec list_to_hex([byte()]) -> [[integer(),...]].
