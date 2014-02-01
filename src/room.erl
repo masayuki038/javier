@@ -39,7 +39,7 @@ loop(Clients) ->
             {NewClients, Removed} = lists:partition(
                 fun({E, _User}) -> not (Pid =:= E) end, Clients
             ),
-            lists:foreach(fun({_R, User}) -> send_message(NewClients, <<"quit.">>, User) end, Removed),
+            lists:foreach(fun({_R, User}) -> ok = send_member_status({quit, User}, NewClients) end, Removed),
             loop(NewClients)
     end.
 

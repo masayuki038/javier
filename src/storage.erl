@@ -51,7 +51,7 @@ generate_message_id(Content, Seed) ->
 
 -spec get_messages() -> list().
 get_messages() ->
-    take(5, do(qlc:sort(qlc:q([X || X <- mnesia:table(message)]),[{order,  
+    take(10, do(qlc:sort(qlc:q([X || X <- mnesia:table(message)]),[{order,  
         fun(M1, M2) ->
             #message{at = At1} = M1,
             #message{at = At2} = M2,

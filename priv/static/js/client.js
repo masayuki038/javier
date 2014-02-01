@@ -95,6 +95,7 @@ function ChatCtrl($scope, $sanitize, ChatService) {
   $scope.messages = [];
   $scope.active = true;
   $scope.unread = 0;
+  $scope.states = [];
 
   window.onblur = function() {
     $scope.inactivate();
@@ -116,6 +117,8 @@ function ChatCtrl($scope, $sanitize, ChatService) {
   });
 
   ChatService.on_update_status(function(data) {
+    $scope.states = data.states;
+    $scope.$apply();
   });
 
   $scope.connect = function(uri) {
