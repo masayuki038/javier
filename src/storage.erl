@@ -4,38 +4,38 @@
 -include("message.hrl").
 -include_lib("stdlib/include/qlc.hrl").
 
-clean_start() ->
+clean_start(DbType) ->
     Node = node(),
     mnesia:delete_schema([Node]),
-        start().
+    start(DbType).
 
-start() ->
+start(DbType) ->
     Node = node(),
-        case mnesia:create_schema([Node]) of
+    case mnesia:create_schema([Node]) of
         ok ->
-            prepare_db(true, Node);
+            prepare_db(true, Node, DbType);
         {error, {Node, {already_exists, Node}}} ->
-            prepare_db(false, Node); 
+            prepare_db(false, Node, DbType); 
         _ -> error
     end.
 
 stop() ->
     mnesia:stop().
 
--spec prepare_db(_, _) -> any().
-prepare_db(CreateTables, Node) ->
+-spec prepare_db(_, _, _) -> any().
+prepare_db(CreateTables, Node, DbType) ->
     ok = mnesia:start(),
     case CreateTables of
         true -> 
-            ok = create_tables(Node);
+            ok = create_tables(Node, DbType);
         false -> ok
      end,
     mnesia:wait_for_tables([message], 20000).
 
--spec create_tables(_) -> ok.
-create_tables(Node) ->
-    mnesia:create_table(message, [{attributes, record_info(fields, message)}, {disc_copies, [Node]}]),
-    mnesia:create_table(member, [{attributes, record_info(fields, member)}, {disc_copies, [Node]}]),
+-spec create_tables(_, _) -> ok.
+create_tables(Node, DbType) ->
+    mnesia:create_table(message, [{attributes, record_info(fields, message)}, {DbType, [Node]}]),
+    mnesia:create_table(member, [{attributes, record_info(fields, member)}, {DbType, [Node]}]),
     ok.
 
 -spec create_message(undefined | binary(), _) -> message().
@@ -69,6 +69,16 @@ do(Q) ->
     {atomic, Val} = mnesia:transaction(F),
     Val.
                
+-spec get_members() -> list().
+get_members() ->
+    take(5, do(qlc:sort(qlc:q([X || X <- mnesia:table(member)]),[{order,  
+        fun(M1, M2) ->
+            #member{name = Name1} = M1,
+            #member{name = Name2} = M2,
+            Name1 < Name2
+        end}])
+    )).
+
 -spec update_message(_) -> {aborted, _} | {atomic, _}.
 update_message(M) ->
     mnesia:transaction(fun() ->mnesia:write(M) end).

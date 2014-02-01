@@ -1,5 +1,6 @@
 -module(room).
 -export([loop/1]).
+-export([update_status/1]).
 
 -include("message.hrl").
 
@@ -9,7 +10,7 @@ loop(Clients) ->
             lager:info("~p joined~n", [Pid]),
             NewClients = [{Pid, User} | Clients],
             publish([{Pid, User}], storage:get_messages()),
-            ok = send_message(NewClients, <<"joined.">>, User),
+            ok = send_member_status({join, User}, NewClients),
             loop(NewClients);
         {message, {Content, User}} ->
             lager:info("~p(~p) received~n", [Content, User]),
@@ -47,6 +48,11 @@ send_message(Clients, Content, User) ->
     storage:update_message(Message),
     publish(Clients, [Message]).
 
+send_member_status(Event, Clients) ->
+    States = update_status(Clients),
+    lists:foreach(fun(Client) -> {Pid, _Member} = Client, Pid ! {update_status, Event, States} end, Clients),
+    ok.
+
 publish([Client | Clients], Messages) ->
     lager:info("publish([Pid | Pids], Message)"),
     lager:info("Client: ~p", [Client]),
@@ -56,5 +62,8 @@ publish([Client | Clients], Messages) ->
 publish([], _Messages) ->
     ok.
 
-
-    
+update_status(Clients) ->
+    Names = lists:map(fun(X) -> {_, User} = X, User end, Clients), 
+    Members = lists:map(fun(X) -> #member{name = Name} = X, Name end, storage:get_members()),
+    States = lists:map(fun(X) -> {X, lists:member(X, Names)} end, Members),
+    lists:reverse(States).

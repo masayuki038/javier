@@ -43,6 +43,10 @@ app.factory('ChatService', function() {
       service.unauth_callback(data);
     });
 
+    server.bind('update_status', function(data) {
+      service.update_status_callback(data);
+    });
+
     service.server = server;
   }
 
@@ -66,6 +70,10 @@ app.factory('ChatService', function() {
 
   service.on_unauthenticated = function(callback) {
     service.unauth_callback = callback;
+  }
+
+  service.on_update_status = function(callback) {
+    service.update_status_callback = callback;
   }
 
   return service;
@@ -105,6 +113,9 @@ function ChatCtrl($scope, $sanitize, ChatService) {
       document.title = "javier(" + $scope.unread + ")";
     }
     $scope.$apply();
+  });
+
+  ChatService.on_update_status(function(data) {
   });
 
   $scope.connect = function(uri) {

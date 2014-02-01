@@ -48,6 +48,12 @@ websocket_info({unauthenticated, Member}, Req, State) ->
     lager:info("Member: ~p", [Member]),
     Encoded = jsonx:encode([{<<"event">>, <<"unauthenticated">>}, {<<"data">>, [{<<"error">>, <<"Authentication Failed">>}]}]),
     {reply, {text, Encoded}, Req, State};
+websocket_info({update_status, {EventType, Name}, States}, Req, State) ->
+    lager:info("websocket_info({update_status, Event, States}, Req, State)"),
+    Deployed = lists:map(fun({Member, Joined}) -> [{<<"member">>, Member}, {<<"joined">>, Joined}] end, States),
+    Encoded = jsonx:encode([{<<"event">>, <<"update_status">>}, {<<"data">>, [{<<"event_type">>, EventType}, {<<"name">>, Name}, {<<"states">>, Deployed}]}]),
+    lager:info("Encoded: ~p", [Encoded]),
+    {reply, {text, Encoded}, Req, State};    
 websocket_info(_Info, Req, State) ->    
     lager:info("websocket_info/3"),
     {ok, Req, State}.
