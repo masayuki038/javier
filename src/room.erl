@@ -1,6 +1,7 @@
 -module(room).
 -export([loop/1]).
 -export([update_status/1]).
+-export([send_mail/3]).
 
 -include("message.hrl").
 
@@ -15,6 +16,22 @@ loop(Clients) ->
         {message, {Content, User}} ->
             lager:info("~p(~p) received~n", [Content, User]),
             ok = send_message(Clients, Content, User),
+            case re:run(Content, "^@([^\s]+).*$", [dotall, {capture, [1], list}]) of
+                {match, Result} ->
+                    [To | _] = Result,
+                    lager:info("mention: ~p", [To]),
+                    Members = storage:get_members(),
+                    Filtered = lists:filter(fun(#member{name = Name}) -> To =:= binary_to_list(Name) end, Members),
+                    lager:info("length(Filtered): ~p", [length(Filtered)]),
+                    case length(Filtered) of
+                        1 -> 
+                            [SendFor | _] = Filtered,
+                            #member{mail = Mail} = SendFor,  
+                            send_mail(User, Mail, Content);
+                        _ -> 
+                            lager:info("member not found: ~p", [To])
+                    end
+            end, 
             loop(Clients);
         {authenticate, {Pid, Input}} ->
             #member{mail = Mail, password = Password, name = Name} = Input,
@@ -67,3 +84,16 @@ update_status(Clients) ->
     Members = lists:map(fun(X) -> #member{name = Name} = X, Name end, storage:get_members()),
     States = lists:map(fun(X) -> {X, lists:member(X, Names)} end, Members),
     lists:reverse(States).
+
+send_mail(Sender, To, Message) ->
+    Host = econfig:get_value(javier, "smtp", "host"),
+    Port = econfig:get_value(javier, "smtp", "port"),
+ 
+    Subject = econfig:get_value(javier, "smtp", "subject"),
+    From = econfig:get_value(javier, "smtp", "from"),
+
+    SiteUrl = econfig:get_value(javier, "smtp", "site_url"),
+    Body = io_lib:format("Hi. You got a message from @~s.~n~n~s~n~nPlease check the site.~n~s", [Sender, Message, SiteUrl]),
+
+    MailBody = io_lib:format("Subject: ~s\r\nFrom: ~s \r\nTo: ~s \r\n\r\n~s", [Subject, From, To, Body]),
+    gen_smtp_client:send_blocking({From, [To], MailBody}, [{relay, Host}, {port, Port}]).

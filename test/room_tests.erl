@@ -2,6 +2,13 @@
 -include_lib("eunit/include/eunit.hrl").
 -include("message.hrl").
 
+send_mail_test() ->
+  application:start(gproc),
+  application:star(econfig),
+  ok = econfig:register_config(javier, ["../javier.ini"], [autoreload]),
+  true = econfig:subscribe(javier),
+  room:send_mail("naoki", "masayuki038@gmail.com", "test mail").
+
 update_status_test_() ->
     {setup, fun start/0, fun stop/1,
         fun(_) -> 
