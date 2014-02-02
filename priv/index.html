@@ -38,11 +38,11 @@
  	  <div class="row">
         <div class="col-lg-8">
           <div class="list-group">
-            <a href="#" class="list-group-item" ng-repeat="message in messages">
+            <span class="list-group-item" ng-repeat="message in messages">
               <div class="message-at">{{message.at}}</div>
               <p class="list-group-item-heading" style="overflow: hidden">{{message.user}}</p>
               <p class="list-group-item-text" ng-bind-html="message.message | sanitize | convert_linefeed"></p>
-            </a>
+            </span>
           </div>
         </div>
         <div class="col-lg-4">
