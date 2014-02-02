@@ -27,7 +27,8 @@ loop(Clients) ->
                         1 -> 
                             [SendFor | _] = Filtered,
                             #member{mail = Mail} = SendFor,  
-                            send_mail(User, Mail, Content);
+                            Ret = send_mail(User, Mail, Content),
+                            lager:info("send_mail: ~p", [Ret]);
                         _ -> 
                             lager:info("member not found: ~p", [To])
                     end
@@ -86,6 +87,7 @@ update_status(Clients) ->
     lists:reverse(States).
 
 send_mail(Sender, To, Message) ->
+    lager:info("send_mail(Sender, To, Message)"),
     Host = econfig:get_value(javier, "smtp", "host"),
     Port = econfig:get_value(javier, "smtp", "port"),
  
@@ -93,7 +95,7 @@ send_mail(Sender, To, Message) ->
     From = econfig:get_value(javier, "smtp", "from"),
 
     SiteUrl = econfig:get_value(javier, "smtp", "site_url"),
-    Body = io_lib:format("Hi. You got a message from @~s.~n~n~s~n~nPlease check the site.~n~s", [Sender, Message, SiteUrl]),
-
+    Body = io_lib:format("Hi. You got a message from @~s.\r\n\r\n~s\r\n\r\nPlease check the site.\r\n~s", [Sender, Message, SiteUrl]),
     MailBody = io_lib:format("Subject: ~s\r\nFrom: ~s \r\nTo: ~s \r\n\r\n~s", [Subject, From, To, Body]),
+    lager:info("MailBody: ~p", [MailBody]),
     gen_smtp_client:send_blocking({From, [To], MailBody}, [{relay, Host}, {port, Port}]).
