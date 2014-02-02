@@ -48,7 +48,7 @@
         <div class="col-lg-4">
           members
           <div class="list-group">
-            <a href="#" class="list-group-item" ng-repeat="state in states">
+            <a href="#" class="list-group-item" ng-repeat="state in states" ng-click="set_mention(state.member)">
               <span ng-if="state.joined" class="label label-success">online</span>
               <span ng-if="!state.joined" class="label label-default">offline</span>
               <span class="list-group-item-heading">{{state.member}}</span>

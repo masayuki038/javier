@@ -144,6 +144,14 @@ function ChatCtrl($scope, $sanitize, ChatService) {
     $scope.unread = 0;
     window.setTimeout(function () { $(document).attr("title", "javier"); }, 200);
   }
+ 
+  $scope.set_mention = function(member) {
+    var message = $scope.message;
+    if(!message) {
+        message = "";
+    }
+    $scope.message = message + "@" + member + " ";
+  }
 
   var chomp = function(str) {
     if(str == undefined || str == null) {
