@@ -31,7 +31,8 @@ loop(Clients) ->
                             lager:info("send_mail: ~p", [Ret]);
                         _ -> 
                             lager:info("member not found: ~p", [To])
-                    end
+                    end;
+                _ -> ok
             end, 
             loop(Clients);
         {authenticate, {Pid, Input}} ->
