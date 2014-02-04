@@ -2,12 +2,12 @@ var app = angular.module('app', ['ngSanitize']);
 
 app.directive('ngEnter', function() {
   return function (scope, element, attrs) {
-    element.bind("keyup", function (event) {
+    element.bind("keypress", function (event) {
       if (event.which == 13 && event.shiftKey) {
         scope.$apply(function(){
           scope.$eval(attrs.ngEnter);
         });
-        event.preventDefault();
+        return false;
       }
     });
   };
