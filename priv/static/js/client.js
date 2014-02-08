@@ -87,7 +87,7 @@ app.filter('sanitize', function($sanitize) {
 
 app.filter('convert_linefeed', function() {
   return function(input) {
-    return input.replace(/&#10;/, '<br/>');
+    return input.replace(/&#10;/g, '<br/>');
   }
 });
 
