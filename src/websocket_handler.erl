@@ -24,8 +24,9 @@ websocket_handle({text, Msg}, Req, State) ->
     case Decoded of
         {[{<<"event">>, <<"send_message">>}, {<<"data">>, {[{<<"message">>, Content}, {<<"user">>, User}]}}]} ->
             room ! {message, {Content, User}};
-        {[{<<"event">>, <<"authenticate">>}, {<<"data">>, {[{<<"mail">>, Mail}, {<<"password">>, Password}, {<<"name">>, Name}]}}]} ->
-            room ! {authenticate, {self(), #member{mail = Mail, password = Password, name = Name}}}
+        {[{<<"event">>, <<"authenticate">>}, {<<"data">>, Data}]} ->
+            {[{<<"mail">>, Mail}, {<<"password">>, Password}, {<<"name">>, Name}, {<<"update">>, Update}]} = Data,
+            room ! {authenticate, {self(), #member{mail = Mail, password = Password, name = Name}, Update}}
     end,
     {ok, Req, State}.
 

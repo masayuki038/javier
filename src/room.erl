@@ -35,22 +35,26 @@ loop(Clients) ->
                 _ -> ok
             end, 
             loop(Clients);
-        {authenticate, {Pid, Input}} ->
+        {authenticate, {Pid, Input, Update}} ->
             #member{mail = Mail, password = Password, name = Name} = Input,
             lager:info("~p try authentication~n", [Name]),
-            case storage:get_member(Mail) of
-                {ok, Member} ->
-                    %% password check
-                    #member{password = Password2} = Member,
-                    case  Password =:= Password2 of
-                        true -> 
-                            Pid ! {authenticated, Member};
-                        false ->
-                            Pid ! {unauthenticated, Input}
-                    end;
-                {ng, _} ->
-                    storage:update_member(Input),
-                    Pid ! {authenticated, Input}
+            case check_parameters(Mail, Password, Name, Update) of
+                ng -> Pid ! {unauthenticated, Input};
+                ok ->
+                    case storage:get_member(Mail) of
+                        {ok, Member} ->
+                            %% password check
+                            #member{password = Password2} = Member,
+                            case  Password =:= Password2 of
+                                true -> 
+                                    Pid ! {authenticated, Member};
+                                false ->
+                                    Pid ! {unauthenticated, Input}
+                            end;
+                        {ng, _} ->
+                            storage:update_member(Input),
+                            Pid ! {authenticated, Input}
+                    end
             end,
             loop(Clients);
         {quit, Pid} ->
@@ -60,6 +64,23 @@ loop(Clients) ->
             ),
             lists:foreach(fun({_R, User}) -> ok = send_member_status({quit, User}, NewClients) end, Removed),
             loop(NewClients)
+    end.
+
+check_parameters(Mail, Password, Name, Update) ->
+    MailPasswordValid = {check_required(Mail), check_required(Password)},
+    case MailPasswordValid of
+        {ok, ok} -> 
+            case Update of
+                true -> check_required(Name);
+                _ -> ok
+            end;
+        {_, _} -> ng
+    end.
+
+check_required(Param) ->
+    case byte_size(Param) of
+        0 -> ng;
+        _ -> ok
     end.
 
 send_message(Clients, Content, User) ->

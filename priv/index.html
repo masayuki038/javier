@@ -72,12 +72,6 @@
           <form class="form-horizontal">
             <div class="modal-body">
               <div class="form-group">
-                <label for="profile_name" class="col-lg-2 control-label">Name</label>
-                <div class="col-lg-10">
-                  <input type="text" class="form-control" id="profile_name" placeholder="taro" ng-model="name">
-                </div>
-              </div>
-              <div class="form-group">
                 <label for="profile_mail" class="col-lg-2 control-label">Email</label>
                 <div class="col-lg-10">
                   <input type="text" class="form-control" id="profile_mail" placeholder="mail address" ng-model="mail">
@@ -87,6 +81,20 @@
                 <label for="profile_password" class="col-lg-2 control-label">Password</label>
                 <div class="col-lg-10">
                   <input type="password" class="form-control" id="profile_password" placeholder="password" ng-model="password">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-lg-2">&nbsp;</div>
+                <div class="col-lg-10 checkbox">
+                  <label>
+                    <input type="checkbox" id="profile_update_account" ng-model="update_account">New/Update Account
+                  </label>
+                </div>
+              </div>
+              <div class="form-group" ng-show="update_account">
+                <label for="profile_name" class="col-lg-2 control-label">Name</label>
+                <div class="col-lg-10">
+                  <input type="text" class="form-control" id="profile_name" placeholder="taro" ng-model="name">
                 </div>
               </div>
             </div>

@@ -23,7 +23,7 @@ body {
   width: 450px;
 }
 
-//#profile_name {
-//  width: 250px;
-//}
+.checkbox label {
+  font-weight: bold;
+}
 

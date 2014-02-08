@@ -55,8 +55,8 @@ app.factory('ChatService', function() {
     service.server.send('send_message', obj);
   }
 
-  service.login = function(mail, password, name) {
-    var obj = {mail: mail, password: password, name: name};
+  service.login = function(mail, password, name, update) {
+    var obj = {mail: mail, password: password, name: name, update: update};
     service.server.send('authenticate', obj);
   }
 
@@ -164,6 +164,11 @@ function ChatCtrl($scope, $sanitize, ChatService) {
 function LoginCtrl($scope, ChatService) {
   $scope.has_error = false;
   $scope.error = undefined;
+  $scope.update_account = false;
+
+  $scope.mail = "";
+  $scope.password = "";
+  $scope.name = "";
 
   ChatService.on_authenticated(function(data) {
     var storage = sessionStorage;
@@ -180,7 +185,7 @@ function LoginCtrl($scope, ChatService) {
 
   $scope.save_change = function() {
     ChatService.connect($scope.uri, function() {
-      ChatService.login($scope.mail, $scope.password, $scope.name);
+      ChatService.login($scope.mail, $scope.password, $scope.name, $scope.update_account);
     });
   }
 }
