@@ -31,6 +31,10 @@ app.factory('ChatService', function() {
       }
     });
 
+    server.bind('close', function() {
+      alert("Connection closed. Please reload this page.");
+    });
+
     server.bind('message', function(data) {
       service.message_callback(data);  
     });
@@ -58,6 +62,18 @@ app.factory('ChatService', function() {
   service.login = function(mail, password, name, update) {
     var obj = {mail: mail, password: password, name: name, update: update};
     service.server.send('authenticate', obj);
+  }
+
+  service.try_reconnect = function(uri, callback) {
+    return service.connect(uri, function() {
+      var mail = sessionStorage.getItem("mail");
+      if(!mail) {
+        callback();
+        return;
+      }
+      var obj = {mail: mail, token: sessionStorage.getItem("token")};
+      service.server.send('reconnect', obj);
+    });
   }
 
   service.on_message = function(callback) {
@@ -121,11 +137,14 @@ function ChatCtrl($scope, $sanitize, ChatService) {
     $scope.$apply();
   });
 
-  $scope.connect = function(uri) {
+  $scope.start = function(uri) {
     $scope.uri = uri;
-    var storage = sessionStorage;
+    ChatService.try_reconnect(uri, $scope.show_login_dialog);
+  }
+
+  $scope.show_login_dialog = function() {
     $('#login_dialog').on('shown', function () {
-      $('#profile_name').focus();
+      $('#profile_mail').focus();
     });
     $('#login_dialog').modal('show');
   }
@@ -174,10 +193,12 @@ function LoginCtrl($scope, ChatService) {
     var storage = sessionStorage;
     storage.setItem('token', data.token);
     storage.setItem('name', data.name);
+    storage.setItem('mail', data.mail);
     $('#login_dialog').modal('hide');
   });
 
   ChatService.on_unauthenticated(function(data) {
+    $scope.show_login_dialog();
     $scope.has_error = true;
     $scope.error = data.error;
     $scope.$apply();

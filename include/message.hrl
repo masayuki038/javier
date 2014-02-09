@@ -1,7 +1,7 @@
 -record(message, {message_id :: [integer()], content :: binary(), user :: binary(), at}).
 -type message()::#message{}.
 
--record(member, {mail :: binary(), password :: binary(), name :: binary()}).
+-record(member, {mail :: binary(), password :: binary(), name :: binary(), token :: [integer()]}).
 -type member()::#member{}.
 
 -define(record_to_struct(RecordName, Record),

@@ -99,6 +99,15 @@ get_member(Mail) ->
 update_member(M) ->
     mnesia:transaction(fun() ->mnesia:write(M) end).
 
+-spec generate_member_token(binary()) -> [integer()].
+generate_member_token(Mail) ->
+    generate_member_token(Mail, erlang:localtime()).
+
+-spec generate_member_token(binary(), _) -> [integer()]. 
+generate_member_token(Mail, Seed) ->
+    Md5_bin = erlang:md5(lists:concat([binary_to_list(Mail), ";", tuple_to_list_deeply(Seed)])),
+    list_to_binary(lists:flatten([io_lib:format("~2.16.0b", [C]) || <<C>> <= Md5_bin])).
+
 -spec list_to_hex([byte()]) -> [[integer(),...]].
 list_to_hex(L) ->    
     lists:map(fun(X) -> int_to_hex(X) end, L).
