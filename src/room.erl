@@ -1,7 +1,7 @@
 -module(room).
 -export([loop/1]).
 -export([update_status/1]).
--export([send_mail/3]).
+-export([send_mail/3, convert_linefeed/1]).
 
 -include("message.hrl").
 
@@ -147,7 +147,10 @@ send_mail(Sender, To, Message) ->
     From = econfig:get_value(javier, "smtp", "from"),
 
     SiteUrl = econfig:get_value(javier, "smtp", "site_url"),
-    Body = io_lib:format("Hi. You got a message from @~s.\r\n\r\n~s\r\n\r\nPlease check the site.\r\n~s", [Sender, Message, SiteUrl]),
+    Body = io_lib:format("Hi. You got a message from @~s.\r\n\r\n~s\r\n\r\nPlease check the site.\r\n~s", [Sender, convert_linefeed(Message), SiteUrl]),
     MailBody = io_lib:format("Subject: ~s\r\nFrom: ~s \r\nTo: ~s \r\n\r\n~s", [Subject, From, To, Body]),
     lager:info("MailBody: ~p", [MailBody]),
     gen_smtp_client:send_blocking({From, [To], MailBody}, [{relay, Host}, {port, Port}]).
+
+convert_linefeed(Str) ->
+    re:replace(Str, "([^\r])\n", "\\1\r\n", [{return, list}, global]).

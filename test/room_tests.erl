@@ -2,9 +2,13 @@
 -include_lib("eunit/include/eunit.hrl").
 -include("message.hrl").
 
+convert_linefeed_test() ->
+    Str = "hoge\nfoo\r\nbar\rhogehoge\n",
+    ?assertEqual("hoge\r\nfoo\r\nbar\rhogehoge\r\n", room:convert_linefeed(Str)).
+
 send_mail_test() ->
   application:start(gproc),
-  application:star(econfig),
+  application:start(econfig),
   ok = econfig:register_config(javier, ["../javier.ini"], [autoreload]),
   true = econfig:subscribe(javier),
   room:send_mail("naoki", "masayuki038@gmail.com", "test mail").
