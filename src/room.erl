@@ -153,4 +153,5 @@ send_mail(Sender, To, Message) ->
     gen_smtp_client:send_blocking({From, [To], MailBody}, [{relay, Host}, {port, Port}]).
 
 convert_linefeed(Str) ->
-    re:replace(Str, "([^\r])\n", "\\1\r\n", [{return, list}, global]).
+     %%re:replace(Str, "(^|[^\r])\n", "\\1\r\n", [{return, list}, global]).
+     re:replace(Str, "(^|[^\r])\n", "\\1\r\n", [{return, list}, multiline, global]).

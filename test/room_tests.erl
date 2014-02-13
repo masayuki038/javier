@@ -2,9 +2,17 @@
 -include_lib("eunit/include/eunit.hrl").
 -include("message.hrl").
 
-convert_linefeed_test() ->
+convert_linefeed1_test() ->
     Str = "hoge\nfoo\r\nbar\rhogehoge\n",
     ?assertEqual("hoge\r\nfoo\r\nbar\rhogehoge\r\n", room:convert_linefeed(Str)).
+
+convert_linefeed2_test() ->
+    Str = "hoge\n1\nfoo\r\nbar\rhogehoge\n",
+    ?assertEqual("hoge\r\n1\r\nfoo\r\nbar\rhogehoge\r\n", room:convert_linefeed(Str)).
+
+convert_linefeed3_test() ->
+    Str = "hoge\n\nfoo\r\nbar\rhogehoge\n",
+    ?assertEqual("hoge\r\n\r\nfoo\r\nbar\rhogehoge\r\n", room:convert_linefeed(Str)).
 
 send_mail_test() ->
   application:start(gproc),
