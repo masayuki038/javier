@@ -15,7 +15,12 @@ init({tcp, http}, _Req, _Opts) ->
 websocket_init(_TransportName, Req, _Opts) ->
     lager:info("websocket_init/3"),
     {ok, Req, undefined_state}.
- 
+
+websocket_handle({ping, Msg}, Req, State) ->
+    lager:info("websocket_handle({ping, Msg})"),
+    lager:info(Msg),
+    {reply, {pong, Msg}, Req, State};
+
 websocket_handle({text, Msg}, Req, State) ->
     lager:info("websocket_handle/3"),
     lager:info(Msg),
