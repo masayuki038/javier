@@ -4,6 +4,9 @@
 -record(member, {mail :: binary(), password :: binary(), name :: binary(), token :: [integer()]}).
 -type member()::#member{}.
 
+-record(state, {member_states :: [member()], messages :: [message()]}).
+
+
 -define(record_to_struct(RecordName, Record),
   {lists:zip(
       lists:map(fun(F) ->

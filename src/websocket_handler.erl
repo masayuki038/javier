@@ -6,6 +6,7 @@
 -export([websocket_handle/3]).
 -export([websocket_info/3]).
 -export([websocket_terminate/3]).
+-export([to_binary_list/1]).
 -include("message.hrl").
 
 init({tcp, http}, _Req, _Opts) ->
